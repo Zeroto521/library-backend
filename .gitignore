@@ -1,0 +1,5 @@
+# cache
+.history
+
+# node
+node_modules

@@ -4,6 +4,7 @@
   "main": "./src/index.js",
   "author": "Zero <Zeroto521@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon ./src/index.js"
@@ -11,5 +12,8 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "apollo-server": "^2.19.1"
   }
 }

@@ -33,7 +33,7 @@ const resolvers = {
     bookCount: () => data.books.length,
     authorCount: () => data.authors.length,
     allBooks: () => data.books,
-    allAuthors: (root) => data.authors
+    allAuthors: () => data.authors
   },
   Author: {
     authorCount: (root) => {

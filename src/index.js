@@ -1,4 +1,6 @@
-import { ApolloServer, gql } from 'apollo-server'
+import pkg from 'apollo-server'
+
+const { ApolloServer, gql } = pkg
 
 import data from './data.js'
 
@@ -20,13 +22,15 @@ const typeDefs = gql`
   type Query {
     bookCount: Int!
     authorCount: Int!
+    allBooks: [Book!]!
   }
 `
 
 const resolvers = {
   Query: {
     bookCount: () => data.books.length,
-    authorCount: () => data.authors.length
+    authorCount: () => data.authors.length,
+    allBooks: () => data.books
   }
 }
 

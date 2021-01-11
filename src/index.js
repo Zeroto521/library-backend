@@ -35,9 +35,10 @@ const typeDefs = gql`
       published: Int!
       genres: [String!]!
     ): Book
+
     editAuthor(
       name: String!
-      setBornTo: Int!
+      born: Int!
     ): Author    
 }  
 `
@@ -82,7 +83,7 @@ const resolvers = {
     editAuthor: (_, args) => {
       let author = data.authors.find(author => author.name === args.name)
       if (author) {
-        author = { ...author, born: args.setBornTo }
+        author = { ...author, born: args.born }
         const otherAuthors = data.authors.filter(author => author.name !== args.name)
         data.authors = [...otherAuthors, author]
       } else {

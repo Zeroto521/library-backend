@@ -1,6 +1,5 @@
 import { gql } from 'apollo-server'
 import { v1 as uuidv1 } from 'uuid'
-import pkg from 'apollo-server'
 
 import data from './data.js'
 

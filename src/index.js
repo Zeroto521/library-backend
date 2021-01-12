@@ -9,7 +9,8 @@ logger.info('connecting to', config.MONGODB_URL)
 mongoose.connect(config.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useFindAndModify: false
 }).then(() => {
   logger.info('connected to MongoDB')
 }).catch((error) => {

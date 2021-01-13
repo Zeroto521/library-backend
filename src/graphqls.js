@@ -1,6 +1,8 @@
 import { gql } from 'apollo-server'
 import { v1 as uuidv1 } from 'uuid'
 
+import Author from './models/author.js'
+import Book from './models/book.js'
 import data from './data.js'
 
 const typeDefs = gql`
@@ -44,12 +46,19 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => data.books.length,
-    authorCount: () => data.authors.length,
-    allBooks: (_, args) => {
-      let res = data.books
+    bookCount: async () => {
+      const res = await Book.find()
+      return res.length
+    },
+    authorCount: async () => {
+      const res = await Author.find()
+      return res.length
+    },
+    allBooks: async (_, args) => {
+      let res = await Book.find()
+
       if (args.author) {
-        res = res.filter(book => book.author === args.author)
+        res = res.filter(book => book.author.name === args.author)
       }
 
       if (args.genre) {
@@ -58,35 +67,47 @@ const resolvers = {
 
       return res
     },
-    allAuthors: () => data.authors
+    allAuthors: async () => await Author.find()
   },
   Author: {
-    bookCount: (root) => {
-      return data.books.filter(book => book.author === root.name).length
+    bookCount: async (root) => {
+      const books = await Book.find({ author: root.id })
+      return books.length
+    }
+  },
+  Book: {
+    author: async (root) => {
+      const author = await Author.findById(root.author)
+      return {
+        id: author.id,
+        name: author.name,
+        born: author.born
+      }
     }
   },
   Mutation: {
-    addBook: (_, args) => {
-      if (!data.authors.find(author => author.name === args.author)) {
-        const author = {
-          name: args.author,
-          id: uuidv1(),
-        }
-        data.authors = data.authors.concat(author)
+    addBook: async (_, args) => {
+      let author = await Author.findOne({ name: args.author })
+
+      if (!author) {
+        author = await new Author({ name: args.author }).save()
       }
-      const book = { ...args, id: uuidv1() }
-      data.books = data.books.concat(book)
+
+      const book = await new Book({
+        title: args.title,
+        published: args.published,
+        author,
+        genres: args.genres
+      }).save()
 
       return book
     },
-    editAuthor: (_, args) => {
-      let author = data.authors.find(author => author.name === args.name)
+    editAuthor: async (_, args) => {
+      let author = await Author.findOne({ name: args.name })
+
       if (author) {
-        author = { ...author, born: args.born }
-        const otherAuthors = data.authors.filter(author => author.name !== args.name)
-        data.authors = [...otherAuthors, author]
-      } else {
-        return null
+        author.born = args.born
+        await author.save()
       }
 
       return author

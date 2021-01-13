@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const authorSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -13,6 +13,6 @@ const authorSchema = new mongoose.Schema({
 })
 
 
-const Author = mongoose.model('Author', authorSchema)
+const Author = mongoose.model('Author', schema)
 
-export default { Author }
+export default Author 

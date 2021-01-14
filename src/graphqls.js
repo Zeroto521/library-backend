@@ -1,9 +1,7 @@
 import { gql } from 'apollo-server'
-import { v1 as uuidv1 } from 'uuid'
 
 import Author from './models/author.js'
 import Book from './models/book.js'
-import data from './data.js'
 
 const typeDefs = gql`
   type Author {

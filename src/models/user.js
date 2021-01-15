@@ -1,18 +1,17 @@
 import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
     required: true,
     unique: true,
-    minlength: 4
+    minlength: 3
   },
-  born: {
-    type: Number,
+  favoriteGenre: {
+    type: String
   }
 })
 
+const User = mongoose.model('User', schema)
 
-const Author = mongoose.model('Author', schema)
-
-export default Author 
+export default User

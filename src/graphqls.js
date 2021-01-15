@@ -133,7 +133,7 @@ const resolvers = {
         })
       }
     },
-    editAuthor: async (_, args) => {
+    editAuthor: async (_, args, context) => {
       const currentUser = context.currentUser
       if (!currentUser) {
         throw new AuthenticationError("not authenticated")

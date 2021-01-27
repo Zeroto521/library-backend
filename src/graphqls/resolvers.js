@@ -1,70 +1,13 @@
-import { gql, UserInputError, AuthenticationError } from 'apollo-server'
+import { PubSub } from 'apollo-server'
+import { UserInputError, AuthenticationError } from 'apollo-server'
 import jwt from 'jsonwebtoken'
 
-import Author from './models/author.js'
-import Book from './models/book.js'
-import config from './config.js'
-import User from './models/user.js'
+import Author from '../models/author.js'
+import Book from '../models/book.js'
+import config from '../config.js'
+import User from '../models/user.js'
 
-const typeDefs = gql`
-  type User {
-    username: String!
-    favoriteGenre: String!
-    id: ID!
-  }
-
-  type Token {
-    value: String!
-  }
-
-  type Author {
-    id: ID!
-    name: String!
-    born: Int
-    bookCount: Int
-  }
-
-  type Book {
-    id: ID!
-    title: String!
-    published: Int!
-    author: Author!
-    genres: [String!]!
-  }
-
-  type Query {
-    bookCount: Int!
-    authorCount: Int!
-    allBooks(author: String, genre: String): [Book!]!
-    allAuthors: [Author!]!
-    me: User
-  }
-
-  type Mutation {
-    addBook(
-      title: String!
-      author: String
-      published: Int!
-      genres: [String!]!
-    ): Book
-
-    editAuthor(
-      name: String!
-      born: Int!
-    ): Author
-
-    createUser(
-      username: String!
-      favoriteGenre: String!
-    ): User
-
-    login(
-      username: String!
-      password: String!
-    ): Token
-  }
-`
-
+const pubsub = new PubSub()
 
 const resolvers = {
   Query: {
@@ -123,18 +66,22 @@ const resolvers = {
         author = await new Author({ name: args.author }).save()
       }
 
+      const book = new Book({
+        title: args.title,
+        published: args.published,
+        author,
+        genres: args.genres
+      })
+
       try {
-        return await new Book({
-          title: args.title,
-          published: args.published,
-          author,
-          genres: args.genres
-        }).save()
+        await book.save()
       } catch (error) {
-        throw new UserInputError(error.message, {
-          invalidArgs: args,
-        })
+        throw new UserInputError(error.message, { invalidArgs: args })
       }
+
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
+      return book
     },
     editAuthor: async (_, args, context) => {
       const currentUser = context.currentUser
@@ -172,7 +119,12 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, config.JWT_SECRET) }
     }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    }
   }
 }
 
-export { typeDefs, resolvers }
+export default resolvers

@@ -2,12 +2,14 @@ import { ApolloServer } from 'apollo-server'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 
-import { typeDefs, resolvers } from './graphqls.js'
 import config from './config.js'
 import logger from './logger.js'
+import resolvers from './graphqls/resolvers.js'
+import typeDefs from './graphqls/typeDefs.js'
 import User from './models/user.js'
 
 logger.info('connecting to', config.MONGODB_URL)
+
 mongoose.connect(config.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
